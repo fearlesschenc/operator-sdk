@@ -1,56 +1,50 @@
 package reconcile
 
 import (
-	"k8s.io/apimachinery/pkg/runtime"
-	"sigs.k8s.io/controller-runtime/pkg/reconcile"
-	"time"
+	"context"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-type Func func(object runtime.Object) (Result, error)
-
-type Reconciliation struct {
-	object runtime.Object
+type job struct {
+	ctx           context.Context
+	object        client.Object
 }
 
-func Reconcile(object runtime.Object) *Reconciliation {
-	return &Reconciliation{object: object}
+func Reconcile(ctx context.Context, obj client.Object) *job {
+	return &job{ctx: ctx, object: obj}
 }
 
-func (r *Reconciliation) WithSubProcedures(reconcileFunc ...Func) (Result, error) {
-	for _, f := range reconcileFunc {
-		result, err := f(r.object)
-		if err != nil || result.RequeueRequest || result.CancelReconciliation {
-			return result, err
-		}
+func (j *job) WithReconciler(reconciler Reconciler) (result Result, err error) {
+	steps := []Func{}
+	if initializer, ok := reconciler.(Initializer); ok {
+		steps = append(steps, initializer.Initialize)
 	}
-	return Continue()
-}
-
-func (r *Reconciliation) WithSteps(reconcileFunc ...Func) (reconcile.Result, error) {
-	for _, f := range reconcileFunc {
-		result, err := f(r.object)
-
-		if result.RequeueRequest {
-			return RequeueRequestAfter(result.RequeueDelay, err)
-		}
-
-		if result.CancelReconciliation {
-			return DoNotRequeueRequest(err)
-		}
+	if validator, ok := reconciler.(Validator); ok {
+		steps = append(steps, validator.Validate)
+	}
+	if finalizer, ok := reconciler.(Finalizer); ok {
+		steps = append(steps, finalizer.Finalize)
+	}
+	if genericSteps := reconciler.GetReconcileSteps(); genericSteps != nil && len(genericSteps) > 0 {
+		steps = append(steps, genericSteps...)
 	}
 
-	return DoNotRequeueRequest(nil)
-}
+	func() {
+		if statusUpdater, ok := reconciler.(StatusUpdater); ok {
+			defer func() {
+				if updateErr := statusUpdater.UpdateStatus(j.ctx, j.object); err != nil {
+					err = updateErr
+				}
+			}()
+		}
 
-func DoNotRequeueRequest(err error) (reconcile.Result, error) {
-	return reconcile.Result{}, err
-}
+		for _, f := range steps {
+			result, err = f(j.ctx, j.object)
+			if err != nil || result.RequeueRequest || result.CancelReconciliation {
+				return
+			}
+		}
+	}()
 
-func RequeueRequestOnErr(err error) (reconcile.Result, error) {
-	// note: reconcile will auto requeue failed request
-	return reconcile.Result{}, err
-}
-
-func RequeueRequestAfter(duration time.Duration, err error) (reconcile.Result, error) {
-	return reconcile.Result{RequeueAfter: duration}, err
+	return
 }

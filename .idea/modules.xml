@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/operator-sdk.iml" filepath="$PROJECT_DIR$/.idea/operator-sdk.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/operator-utils.iml" filepath="$PROJECT_DIR$/.idea/operator-utils.iml" />
     </modules>
   </component>
 </project>

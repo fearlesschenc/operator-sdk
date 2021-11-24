@@ -1,6 +1,9 @@
 package reconcile
 
-import "time"
+import (
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+	"time"
+)
 
 type Result struct {
 	RequeueDelay         time.Duration
@@ -8,7 +11,7 @@ type Result struct {
 	CancelReconciliation bool
 }
 
-// Continue continue the execution of the whole reconciliation
+// Continue to continue the execution of the whole reconciliation
 func Continue() (result Result, err error) {
 	result = Result{
 		RequeueDelay:         0,
@@ -29,7 +32,7 @@ func StopOnError(errIn error) (result Result, err error) {
 	return
 }
 
-// Stop stop the whole reconciliation
+// Stop the whole reconciliation
 func Stop() (result Result, err error) {
 	return StopOnError(nil)
 }
@@ -55,4 +58,19 @@ func Requeue() (result Result, err error) {
 // RequeueAfter will requeue request after delay.
 func RequeueAfter(delay time.Duration, errIn error) (result Result, err error) {
 	return requeue(delay, errIn)
+}
+
+// controller-runtime results
+
+func DoNotRequeueRequest(err error) (reconcile.Result, error) {
+	return reconcile.Result{}, err
+}
+
+func RequeueRequestOnErr(err error) (reconcile.Result, error) {
+	// note: reconcile will auto requeue failed request
+	return reconcile.Result{}, err
+}
+
+func RequeueRequestAfter(duration time.Duration, err error) (reconcile.Result, error) {
+	return reconcile.Result{RequeueAfter: duration}, err
 }
