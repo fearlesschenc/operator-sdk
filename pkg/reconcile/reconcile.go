@@ -2,15 +2,15 @@ package reconcile
 
 import (
 	"context"
-	"sigs.k8s.io/controller-runtime/pkg/client"
+	"k8s.io/apimachinery/pkg/runtime"
 )
 
 type job struct {
 	ctx           context.Context
-	object        client.Object
+	object        runtime.Object
 }
 
-func Reconcile(ctx context.Context, obj client.Object) *job {
+func Reconcile(ctx context.Context, obj runtime.Object) *job {
 	return &job{ctx: ctx, object: obj}
 }
 

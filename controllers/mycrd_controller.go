@@ -2,9 +2,9 @@ package controllers
 
 import (
 	"context"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 
 	"github.com/fearlesschenc/operator-utils/pkg/reconcile"
@@ -24,7 +24,7 @@ func (r *Reconciler) GetReconcileSteps() []reconcile.Func {
 	}
 }
 
-func (r *Reconciler) reconcileFoo(ctx context.Context, obj client.Object) (reconcile.Result, error) {
+func (r *Reconciler) reconcileFoo(ctx context.Context, obj runtime.Object) (reconcile.Result, error) {
 	// logic
 	return reconcile.Reconcile(ctx, obj).
 		WithReconciler(reconcile.Funcs{
@@ -33,15 +33,15 @@ func (r *Reconciler) reconcileFoo(ctx context.Context, obj client.Object) (recon
 		})
 }
 
-func (r *Reconciler) reconcileFoo1(ctx context.Context, obj client.Object) (reconcile.Result, error) {
+func (r *Reconciler) reconcileFoo1(ctx context.Context, obj runtime.Object) (reconcile.Result, error) {
 	return reconcile.Continue()
 }
 
-func (r *Reconciler) reconcileFoo2(ctx context.Context, obj client.Object) (reconcile.Result, error) {
+func (r *Reconciler) reconcileFoo2(ctx context.Context, obj runtime.Object) (reconcile.Result, error) {
 	return reconcile.Continue()
 }
 
-func (r *Reconciler) reconcileBar(ctx context.Context, obj client.Object) (reconcile.Result, error) {
+func (r *Reconciler) reconcileBar(ctx context.Context, obj runtime.Object) (reconcile.Result, error) {
 	return reconcile.Continue()
 }
 

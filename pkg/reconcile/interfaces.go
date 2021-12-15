@@ -2,10 +2,11 @@ package reconcile
 
 import (
 	"context"
-	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	"k8s.io/apimachinery/pkg/runtime"
 )
 
-type Func func(ctx context.Context, object client.Object) (Result, error)
+type Func func(ctx context.Context, object runtime.Object) (Result, error)
 
 type Funcs []Func
 
@@ -20,17 +21,17 @@ type Reconciler interface {
 }
 
 type StatusUpdater interface {
-	UpdateStatus(ctx context.Context, object client.Object) error
+	UpdateStatus(ctx context.Context, object runtime.Object) error
 }
 
 type Validator interface {
-	Validate(ctx context.Context, object client.Object) (Result, error)
+	Validate(ctx context.Context, object runtime.Object) (Result, error)
 }
 
 type Initializer interface {
-	Initialize(ctx context.Context, object client.Object) (Result, error)
+	Initialize(ctx context.Context, object runtime.Object) (Result, error)
 }
 
 type Finalizer interface {
-	Finalize(ctx context.Context, object client.Object) (Result, error)
+	Finalize(ctx context.Context, object runtime.Object) (Result, error)
 }
