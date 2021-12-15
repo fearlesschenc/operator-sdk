@@ -1,8 +1,9 @@
 package reconcile
 
 import (
-	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	"time"
+
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
 type Result struct {
