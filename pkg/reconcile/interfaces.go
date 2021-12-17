@@ -3,10 +3,10 @@ package reconcile
 import (
 	"context"
 
-	"k8s.io/apimachinery/pkg/runtime"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-type Func func(ctx context.Context, object runtime.Object) (Result, error)
+type Func func(ctx context.Context, object metav1.Object) (Result, error)
 
 type Funcs []Func
 
@@ -21,17 +21,17 @@ type Reconciler interface {
 }
 
 type StatusUpdater interface {
-	UpdateStatus(ctx context.Context, object runtime.Object) error
+	UpdateStatus(ctx context.Context, object metav1.Object) error
 }
 
 type Validator interface {
-	Validate(ctx context.Context, object runtime.Object) (Result, error)
+	Validate(ctx context.Context, object metav1.Object) (Result, error)
 }
 
 type Initializer interface {
-	Initialize(ctx context.Context, object runtime.Object) (Result, error)
+	Initialize(ctx context.Context, object metav1.Object) (Result, error)
 }
 
 type Finalizer interface {
-	Finalize(ctx context.Context, object runtime.Object) (Result, error)
+	Finalize(ctx context.Context, object metav1.Object) (Result, error)
 }

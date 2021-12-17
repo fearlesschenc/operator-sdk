@@ -3,15 +3,15 @@ package reconcile
 import (
 	"context"
 
-	"k8s.io/apimachinery/pkg/runtime"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type job struct {
-	ctx           context.Context
-	object        runtime.Object
+	ctx    context.Context
+	object metav1.Object
 }
 
-func Reconcile(ctx context.Context, obj runtime.Object) *job {
+func Reconcile(ctx context.Context, obj metav1.Object) *job {
 	return &job{ctx: ctx, object: obj}
 }
 
