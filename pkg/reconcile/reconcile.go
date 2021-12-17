@@ -4,6 +4,8 @@ import (
 	"context"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/fearlesschenc/operator-utils/pkg/controller"
 )
 
 type job struct {
@@ -33,6 +35,10 @@ func (j *job) WithReconciler(reconciler Reconciler) (result Result, err error) {
 	func() {
 		if statusUpdater, ok := reconciler.(StatusUpdater); ok {
 			defer func() {
+				if controller.IsObjectBeingDeleted(j.object) {
+					return
+				}
+
 				if updateErr := statusUpdater.UpdateStatus(j.ctx, j.object); err != nil {
 					err = updateErr
 				}
