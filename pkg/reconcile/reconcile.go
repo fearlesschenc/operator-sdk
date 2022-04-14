@@ -39,7 +39,7 @@ func (j *job) WithReconciler(reconciler Reconciler) (result Result, err error) {
 					return
 				}
 
-				if updateErr := statusUpdater.UpdateStatus(j.ctx, j.object); err != nil {
+				if updateErr := statusUpdater.UpdateStatus(j.ctx, j.object); updateErr != nil {
 					err = updateErr
 				}
 			}()
