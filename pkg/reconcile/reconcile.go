@@ -22,11 +22,11 @@ func (j *job) WithReconciler(reconciler Reconciler) (result Result, err error) {
 	if initializer, ok := reconciler.(Initializer); ok {
 		steps = append(steps, initializer.Initialize)
 	}
-	if validator, ok := reconciler.(Validator); ok {
-		steps = append(steps, validator.Validate)
-	}
 	if finalizer, ok := reconciler.(Finalizer); ok {
 		steps = append(steps, finalizer.Finalize)
+	}
+	if validator, ok := reconciler.(Validator); ok {
+		steps = append(steps, validator.Validate)
 	}
 	if genericSteps := reconciler.GetReconcileSteps(); genericSteps != nil && len(genericSteps) > 0 {
 		steps = append(steps, genericSteps...)
